@@ -1,0 +1,305 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model auth_group {
+  id                     Int                      @id @default(autoincrement())
+  name                   String                   @unique @db.VarChar(150)
+  auth_group_permissions auth_group_permissions[]
+  auth_user_groups       auth_user_groups[]
+
+  @@index([name], map: "auth_group_name_a6ea08ec_like")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model auth_group_permissions {
+  id              BigInt          @id @default(autoincrement())
+  group_id        Int
+  permission_id   Int
+  auth_permission auth_permission @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_group_permissio_permission_id_84c5c92e_fk_auth_perm")
+  auth_group      auth_group      @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_group_permissions_group_id_b120cbf9_fk_auth_group_id")
+
+  @@unique([group_id, permission_id], map: "auth_group_permissions_group_id_permission_id_0cd325b0_uniq")
+  @@index([group_id], map: "auth_group_permissions_group_id_b120cbf9")
+  @@index([permission_id], map: "auth_group_permissions_permission_id_84c5c92e")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model auth_permission {
+  id                         Int                          @id @default(autoincrement())
+  name                       String                       @db.VarChar(255)
+  content_type_id            Int
+  codename                   String                       @db.VarChar(100)
+  auth_group_permissions     auth_group_permissions[]
+  django_content_type        django_content_type          @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_permission_content_type_id_2f476e4b_fk_django_co")
+  auth_user_user_permissions auth_user_user_permissions[]
+
+  @@unique([content_type_id, codename], map: "auth_permission_content_type_id_codename_01ab375a_uniq")
+  @@index([content_type_id], map: "auth_permission_content_type_id_2f476e4b")
+}
+
+model auth_user {
+  id                           Int                            @id @default(autoincrement())
+  password                     String                         @db.VarChar(128)
+  last_login                   DateTime?                      @db.Timestamptz(6)
+  is_superuser                 Boolean
+  username                     String                         @unique @db.VarChar(150)
+  first_name                   String                         @db.VarChar(150)
+  last_name                    String                         @db.VarChar(150)
+  email                        String                         @db.VarChar(254)
+  is_staff                     Boolean
+  is_active                    Boolean
+  date_joined                  DateTime                       @db.Timestamptz(6)
+  auth_user_groups             auth_user_groups[]
+  auth_user_user_permissions   auth_user_user_permissions[]
+  django_admin_log             django_admin_log[]
+  estt_main_app_gamesuggestion estt_main_app_gamesuggestion[]
+  estt_main_app_org_leader     estt_main_app_org_leader[]
+  estt_main_app_org_user       estt_main_app_org_user[]
+  estt_main_app_team_user      estt_main_app_team_user[]
+  estt_main_app_time           estt_main_app_time[]
+
+  @@index([username], map: "auth_user_username_6821ab7c_like")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model auth_user_groups {
+  id         BigInt     @id @default(autoincrement())
+  user_id    Int
+  group_id   Int
+  auth_group auth_group @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_user_groups_group_id_97559544_fk_auth_group_id")
+  auth_user  auth_user  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_user_groups_user_id_6a12ed8b_fk_auth_user_id")
+
+  @@unique([user_id, group_id], map: "auth_user_groups_user_id_group_id_94350c0c_uniq")
+  @@index([group_id], map: "auth_user_groups_group_id_97559544")
+  @@index([user_id], map: "auth_user_groups_user_id_6a12ed8b")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model auth_user_user_permissions {
+  id              BigInt          @id @default(autoincrement())
+  user_id         Int
+  permission_id   Int
+  auth_permission auth_permission @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm")
+  auth_user       auth_user       @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id")
+
+  @@unique([user_id, permission_id], map: "auth_user_user_permissions_user_id_permission_id_14a6b632_uniq")
+  @@index([permission_id], map: "auth_user_user_permissions_permission_id_1fbb5f2c")
+  @@index([user_id], map: "auth_user_user_permissions_user_id_a95ead1b")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model django_admin_log {
+  id                  Int                  @id @default(autoincrement())
+  action_time         DateTime             @db.Timestamptz(6)
+  object_id           String?
+  object_repr         String               @db.VarChar(200)
+  action_flag         Int                  @db.SmallInt
+  change_message      String
+  content_type_id     Int?
+  user_id             Int
+  django_content_type django_content_type? @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "django_admin_log_content_type_id_c4bce8eb_fk_django_co")
+  auth_user           auth_user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "django_admin_log_user_id_c564eba6_fk_auth_user_id")
+
+  @@index([content_type_id], map: "django_admin_log_content_type_id_c4bce8eb")
+  @@index([user_id], map: "django_admin_log_user_id_c564eba6")
+}
+
+model django_content_type {
+  id               Int                @id @default(autoincrement())
+  app_label        String             @db.VarChar(100)
+  model            String             @db.VarChar(100)
+  auth_permission  auth_permission[]
+  django_admin_log django_admin_log[]
+
+  @@unique([app_label, model], map: "django_content_type_app_label_model_76bd3d3b_uniq")
+}
+
+model django_migrations {
+  id      BigInt   @id @default(autoincrement())
+  app     String   @db.VarChar(255)
+  name    String   @db.VarChar(255)
+  applied DateTime @db.Timestamptz(6)
+}
+
+model django_session {
+  session_key  String   @id @db.VarChar(40)
+  session_data String
+  expire_date  DateTime @db.Timestamptz(6)
+
+  @@index([expire_date], map: "django_session_expire_date_a5c62663")
+  @@index([session_key], map: "django_session_session_key_c0390e0f_like")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model estt_main_app_diamond_times {
+  id                  BigInt              @id @default(autoincrement())
+  diamond_target      String              @db.VarChar(9)
+  level_id            BigInt
+  team_id             BigInt
+  estt_main_app_level estt_main_app_level @relation(fields: [level_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_diamon_level_id_41ed07b5_fk_estt_main")
+  estt_main_app_team  estt_main_app_team  @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_diamon_team_id_082a5740_fk_estt_main")
+
+  @@unique([level_id, team_id], map: "estt_main_app_diamond_times_level_id_team_id_a175213a_uniq")
+  @@index([level_id], map: "estt_main_app_diamond_times_level_id_41ed07b5")
+  @@index([team_id], map: "estt_main_app_diamond_times_team_id_082a5740")
+}
+
+model estt_main_app_game {
+  id                      BigInt                    @id @default(autoincrement())
+  game                    String                    @db.VarChar(50)
+  estt_main_app_level     estt_main_app_level[]
+  estt_main_app_team_game estt_main_app_team_game[]
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model estt_main_app_gamesuggestion {
+  id              BigInt    @id @default(autoincrement())
+  game_name       String    @unique @db.VarChar(255)
+  created_at      DateTime  @db.Timestamptz(6)
+  suggested_by_id Int
+  auth_user       auth_user @relation(fields: [suggested_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_gamesu_suggested_by_id_08bc5d97_fk_auth_user")
+
+  @@index([game_name], map: "estt_main_app_gamesuggestion_game_name_4cb700a1_like")
+  @@index([suggested_by_id], map: "estt_main_app_gamesuggestion_suggested_by_id_08bc5d97")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model estt_main_app_level {
+  id                          BigInt                        @id @default(autoincrement())
+  level_name                  String                        @db.VarChar(50)
+  game_id                     BigInt
+  estt_main_app_diamond_times estt_main_app_diamond_times[]
+  estt_main_app_game          estt_main_app_game            @relation(fields: [game_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_level_game_id_5c2e6655_fk_estt_main_app_game_id")
+  estt_main_app_target_times  estt_main_app_target_times[]
+  estt_main_app_time          estt_main_app_time[]
+
+  @@index([game_id], map: "estt_main_app_level_game_id_5c2e6655")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model estt_main_app_org_join_code {
+  id                         BigInt                     @id @default(autoincrement())
+  code                       String                     @db.VarChar(20)
+  org_id                     BigInt
+  estt_main_app_organization estt_main_app_organization @relation(fields: [org_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_org_jo_org_id_551a4f37_fk_estt_main")
+
+  @@index([org_id], map: "estt_main_app_org_join_code_org_id_551a4f37")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model estt_main_app_org_leader {
+  id                         BigInt                     @id @default(autoincrement())
+  created_at                 DateTime                   @db.Timestamptz(6)
+  org_id                     BigInt
+  user_id                    Int
+  estt_main_app_organization estt_main_app_organization @relation(fields: [org_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_org_le_org_id_8465feb2_fk_estt_main")
+  auth_user                  auth_user                  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_org_leader_user_id_3297b445_fk_auth_user_id")
+
+  @@unique([user_id, org_id], map: "estt_main_app_org_leader_user_id_org_id_e062baec_uniq")
+  @@index([org_id], map: "estt_main_app_org_leader_org_id_8465feb2")
+  @@index([user_id], map: "estt_main_app_org_leader_user_id_3297b445")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model estt_main_app_org_team {
+  id                         BigInt                     @id @default(autoincrement())
+  team_id                    BigInt
+  org_id                     BigInt
+  estt_main_app_organization estt_main_app_organization @relation(fields: [org_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_org_te_org_id_2c4ac183_fk_estt_main")
+  estt_main_app_team         estt_main_app_team         @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_org_te_team_id_63b79551_fk_estt_main")
+
+  @@index([org_id], map: "estt_main_app_org_team_org_id_2c4ac183")
+  @@index([team_id], map: "estt_main_app_org_team_team_id_63b79551")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model estt_main_app_org_user {
+  id                         BigInt                     @id @default(autoincrement())
+  user_id                    Int
+  org_id                     BigInt
+  estt_main_app_organization estt_main_app_organization @relation(fields: [org_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_org_us_org_id_511c4585_fk_estt_main")
+  auth_user                  auth_user                  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_org_user_user_id_d6f5176a_fk_auth_user_id")
+
+  @@index([org_id], map: "estt_main_app_org_user_org_id_511c4585")
+  @@index([user_id], map: "estt_main_app_org_user_user_id_d6f5176a")
+}
+
+model estt_main_app_organization {
+  id                          BigInt                        @id @default(autoincrement())
+  name                        String                        @db.VarChar(50)
+  created_at                  DateTime                      @db.Timestamptz(6)
+  estt_main_app_org_join_code estt_main_app_org_join_code[]
+  estt_main_app_org_leader    estt_main_app_org_leader[]
+  estt_main_app_org_team      estt_main_app_org_team[]
+  estt_main_app_org_user      estt_main_app_org_user[]
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model estt_main_app_target_times {
+  id                  BigInt              @id @default(autoincrement())
+  high_target         String              @db.VarChar(9)
+  low_target          String              @db.VarChar(9)
+  level_id            BigInt
+  team_id             BigInt
+  estt_main_app_level estt_main_app_level @relation(fields: [level_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_target_level_id_06a10039_fk_estt_main")
+  estt_main_app_team  estt_main_app_team  @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_target_team_id_367db942_fk_estt_main")
+
+  @@index([level_id], map: "estt_main_app_target_times_level_id_06a10039")
+  @@index([team_id], map: "estt_main_app_target_times_team_id_367db942")
+}
+
+model estt_main_app_team {
+  id                          BigInt                        @id @default(autoincrement())
+  name                        String                        @db.VarChar(50)
+  estt_main_app_diamond_times estt_main_app_diamond_times[]
+  estt_main_app_org_team      estt_main_app_org_team[]
+  estt_main_app_target_times  estt_main_app_target_times[]
+  estt_main_app_team_game     estt_main_app_team_game[]
+  estt_main_app_team_user     estt_main_app_team_user[]
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model estt_main_app_team_game {
+  id                 BigInt             @id @default(autoincrement())
+  game_id            BigInt
+  team_id            BigInt
+  estt_main_app_game estt_main_app_game @relation(fields: [game_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_team_g_game_id_f74bb0d2_fk_estt_main")
+  estt_main_app_team estt_main_app_team @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_team_g_team_id_0c2469e7_fk_estt_main")
+
+  @@index([game_id], map: "estt_main_app_team_game_game_id_f74bb0d2")
+  @@index([team_id], map: "estt_main_app_team_game_team_id_0c2469e7")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model estt_main_app_team_user {
+  id                 BigInt             @id @default(autoincrement())
+  isCoach            Boolean
+  team_id            BigInt
+  user_id            Int
+  estt_main_app_team estt_main_app_team @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_team_u_team_id_3fe9e363_fk_estt_main")
+  auth_user          auth_user          @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_team_user_user_id_3663330a_fk_auth_user_id")
+
+  @@index([team_id], map: "estt_main_app_team_user_team_id_3fe9e363")
+  @@index([user_id], map: "estt_main_app_team_user_user_id_3663330a")
+}
+
+/// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
+model estt_main_app_time {
+  id                  BigInt              @id @default(autoincrement())
+  time                String              @db.VarChar(9)
+  level_id            BigInt
+  user_id             Int
+  estt_main_app_level estt_main_app_level @relation(fields: [level_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_time_level_id_256d2a50_fk_estt_main_app_level_id")
+  auth_user           auth_user           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estt_main_app_time_user_id_b5e671d4_fk_auth_user_id")
+
+  @@index([level_id], map: "estt_main_app_time_level_id_256d2a50")
+  @@index([user_id], map: "estt_main_app_time_user_id_b5e671d4")
+}
